@@ -72,18 +72,13 @@ class ProjectsTest extends TestCase
     {
 //        $this->withoutExceptionHandling();
 
-        $attributes = \App\Models\Project::factory()->raw();
+        $attributes = \App\Models\Project::factory()->raw(['owner_id' => null]);
 
-//        dd($attributes);
-//        $attributes = \App\Models\Project::factory()->raw(['owner_id' => '']);
-//        $attributes = \App\Models\Project::factory()->raw(['owner_id' => null]);
-//        dd($this->post('/projects', $attributes));
-
-        $this->post('/projects', $attributes)->assertSessionHasErrors(['name' => 'The name field is required.']);
-//        $this->post('/projects', $attributes)->assertSessionHasErrors('owner_id');
+//        $this->post('/projects', $attributes)->assertSessionHasErrors(['name' => 'The name field is required.']);
+        $this->post('/projects', $attributes)->assertSessionHasErrors('owner_id');
 
 //        $this->post('/projects', $attributes)->assertRedirect('login');
 
-        $this->assertTrue(true);
+//        $this->assertTrue(true);
     }
 }
