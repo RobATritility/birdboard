@@ -17,9 +17,12 @@ class ProjectsTest extends TestCase
 
         $this->withoutExceptionHandling();
 
+        $user = \App\Models\User::factory()->create();
+
         $attributes = [
             'title' => $this->faker->sentence,
-            'description' => $this->faker->paragraph
+            'description' => $this->faker->paragraph,
+            'owner_id' => $user->id
         ];
 
         $this->post('/projects', $attributes)->assertRedirect('/projects');
@@ -32,7 +35,6 @@ class ProjectsTest extends TestCase
     /** @test */
     public function a_user_can_view_a_project()
     {
-
         $this->withoutExceptionHandling();
 
         $project = \App\Models\Project::factory()->create();
@@ -46,10 +48,6 @@ class ProjectsTest extends TestCase
     /** @test */
     public function a_project_requires_a_title()
     {
-
-        // from video but needed change
-        // $attributes = factory('App\Models\Project')->raw(['title' => '']);
-
         $attributes = \App\Models\Project::factory()->raw(['title' => '']);
 
         $this->post('/projects', $attributes)->assertSessionHasErrors('title');
@@ -62,23 +60,13 @@ class ProjectsTest extends TestCase
         $attributes = \App\Models\Project::factory()->raw(['description' => '']);
 
         $this->post('/projects', $attributes)->assertSessionHasErrors('description');
-
-//        $this->assertTrue(true);
-
     }
 
     /** @test */
     public function a_project_requires_an_owner()
     {
-//        $this->withoutExceptionHandling();
-
         $attributes = \App\Models\Project::factory()->raw(['owner_id' => null]);
 
-//        $this->post('/projects', $attributes)->assertSessionHasErrors(['name' => 'The name field is required.']);
         $this->post('/projects', $attributes)->assertSessionHasErrors('owner_id');
-
-//        $this->post('/projects', $attributes)->assertRedirect('login');
-
-//        $this->assertTrue(true);
     }
 }

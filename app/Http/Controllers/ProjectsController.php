@@ -34,7 +34,7 @@ class ProjectsController extends Controller
             'owner_id' => 'required'
         ]);
 
-        $attributes['owner_id'] = auth()->id();
+//        $attributes['owner_id'] = auth()->id();
 
         //persist
         Project::create($attributes);
