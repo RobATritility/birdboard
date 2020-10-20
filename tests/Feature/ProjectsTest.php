@@ -2,6 +2,7 @@
 
 namespace Tests\Feature;
 
+use Illuminate\Auth\Authenticatable;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Foundation\Testing\WithFaker;
 use Tests\TestCase;
@@ -9,20 +10,30 @@ use Tests\TestCase;
 
 class ProjectsTest extends TestCase
 {
-    use WithFaker, RefreshDatabase;
+    use WithFaker, RefreshDatabase, Authenticatable;
+
+    /** @test */
+    public function only_authenticated_users_can_create_projects()
+    {
+        $attributes = \App\Models\Project::factory()->raw();
+
+        $this->post('/projects', $attributes)->assertRedirect('login');
+    }
 
     /** @test */
     public function a_user_can_create_a_project()
     {
 
+        $user = \App\Models\User::factory()->create();
+        
         $this->withoutExceptionHandling();
 
-        $user = \App\Models\User::factory()->create();
+        $this->actingAs(\App\Models\User::factory()->create());
+
 
         $attributes = [
             'title' => $this->faker->sentence,
             'description' => $this->faker->paragraph,
-            'owner_id' => $user->id
         ];
 
         $this->post('/projects', $attributes)->assertRedirect('/projects');
@@ -48,6 +59,8 @@ class ProjectsTest extends TestCase
     /** @test */
     public function a_project_requires_a_title()
     {
+        $this->actingAs(\App\Models\User::factory()->create());
+
         $attributes = \App\Models\Project::factory()->raw(['title' => '']);
 
         $this->post('/projects', $attributes)->assertSessionHasErrors('title');
@@ -57,16 +70,21 @@ class ProjectsTest extends TestCase
     /** @test */
     public function a_project_requires_a_description()
     {
+        $this->actingAs(\App\Models\User::factory()->create());
+
         $attributes = \App\Models\Project::factory()->raw(['description' => '']);
 
         $this->post('/projects', $attributes)->assertSessionHasErrors('description');
     }
 
-    /** @test */
+    /** @testR */
     public function a_project_requires_an_owner()
     {
         $attributes = \App\Models\Project::factory()->raw(['owner_id' => null]);
 
         $this->post('/projects', $attributes)->assertSessionHasErrors('owner_id');
     }
+
+
+
 }
