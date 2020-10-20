@@ -24,7 +24,7 @@ Route::group(['middleware' => 'auth'], function() {
     Route::get('/projects/{project}', [App\Http\Controllers\ProjectsController::class, 'show'])
         ->name('project');
     Route::post('/projects', [App\Http\Controllers\ProjectsController::class, 'store']);
-
+    Route::get('/home', [App\Http\Controllers\HomeController::class, 'index'])->name('home');
 });
 
 
@@ -33,4 +33,3 @@ Route::group(['middleware' => 'auth'], function() {
 Auth::routes();
 
 
-Route::get('/home', [App\Http\Controllers\HomeController::class, 'index'])->name('home');
