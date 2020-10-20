@@ -13,7 +13,7 @@ class ProjectsTest extends TestCase
     use WithFaker, RefreshDatabase, Authenticatable;
 
     /** @test */
-    public function only_authenticated_users_can_create_projects()
+    public function guests_cannot_create_projects()
     {
         $attributes = \App\Models\Project::factory()->raw();
 
@@ -21,11 +21,27 @@ class ProjectsTest extends TestCase
     }
 
     /** @test */
+    public function guests_cannot_view_projects()
+    {
+
+        $this->get('/projects')->assertRedirect('login');
+    }
+
+    /** @test */
+    public function guests_cannot_view_a_single_project()
+    {
+
+        $project = \App\Models\Project::factory()->create();
+
+        $this->get($project->path())->assertRedirect('login');
+    }
+
+    /** @test */
     public function a_user_can_create_a_project()
     {
 
         $user = \App\Models\User::factory()->create();
-        
+
         $this->withoutExceptionHandling();
 
         $this->actingAs(\App\Models\User::factory()->create());
@@ -44,11 +60,13 @@ class ProjectsTest extends TestCase
     }
 
     /** @test */
-    public function a_user_can_view_a_project()
+    public function a_user_can_view_their_project()
     {
+        $this->be(\App\Models\User::factory()->create());
+
         $this->withoutExceptionHandling();
 
-        $project = \App\Models\Project::factory()->create();
+        $project = \App\Models\Project::factory()->create(['owner_id' => auth()->id()]);
 
         //maybe make named route
         $this->get('/projects/'.$project->id)
